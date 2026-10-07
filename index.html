@@ -1,0 +1,1238 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>LyfzStore - POS & Digital Gaming Store</title>
+  <style>
+    /* CSS RESET & MODERN DESIGN SYSTEM */
+    :root {
+      --bg-color: #0b0f19;
+      --card-bg: #1e293b;
+      --header-bg: rgba(30, 41, 59, 0.95);
+      --input-bg: #0f172a;
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --border-color: #334155;
+      --primary-color: #38bdf8;
+      --neon-pink: #ff007f;
+      --neon-glow: 0 0 10px rgba(56, 189, 248, 0.8), 0 0 20px rgba(56, 189, 248, 0.5);
+    }
+
+    body.light-mode {
+      --bg-color: #f8fafc;
+      --card-bg: #ffffff;
+      --header-bg: rgba(255, 255, 255, 0.95);
+      --input-bg: #f1f1f1;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border-color: #cbd5e1;
+      --primary-color: #0284c7;
+      --neon-pink: #d90429;
+      --neon-glow: 0 0 10px rgba(2, 132, 199, 0.6);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+    
+    html, body {
+      background-color: var(--bg-color); 
+      background-image: 
+        radial-gradient(rgba(56, 189, 248, 0.12) 1px, transparent 1px), 
+        radial-gradient(rgba(139, 92, 246, 0.1) 1px, var(--bg-color) 1px);
+      background-size: 24px 24px;
+      background-position: 0 0, 12px 12px;
+      color: var(--text-main); 
+      min-height: 100vh; 
+      padding-bottom: 60px; 
+      transition: background-color 0.3s, color 0.3s; 
+      overflow-x: hidden;
+    }
+    
+    /* HEADER & NAV BAR RESPONSIF */
+    header { 
+      background: var(--header-bg); 
+      backdrop-filter: blur(10px); 
+      padding: 12px 16px; 
+      display: flex; 
+      flex-direction: column;
+      gap: 10px;
+      align-items: center; 
+      border-bottom: 1px solid var(--border-color); 
+      position: sticky; 
+      top: 0; 
+      z-index: 100; 
+    }
+
+    @media (min-width: 640px) {
+      header {
+        flex-direction: row;
+        justify-content: space-between;
+        padding: 16px 24px;
+      }
+    }
+    
+    .logo { 
+      font-size: 1.4rem; 
+      font-weight: 800; 
+      color: var(--primary-color); 
+      display: flex; 
+      align-items: center; 
+      gap: 8px; 
+      text-shadow: var(--neon-glow);
+    }
+    
+    .neon-title {
+      color: var(--primary-color);
+      text-shadow: var(--neon-glow);
+    }
+
+    nav { 
+      display: flex; 
+      gap: 4px; 
+      align-items: center; 
+      justify-content: center;
+      flex-wrap: wrap; 
+      width: 100%;
+    }
+    
+    nav button { 
+      background: transparent; 
+      border: 1px solid transparent; 
+      color: var(--text-muted); 
+      font-size: 0.8rem; 
+      font-weight: 600; 
+      padding: 6px 10px; 
+      border-radius: 8px; 
+      cursor: pointer; 
+      transition: all 0.2s; 
+      white-space: nowrap;
+    }
+    
+    nav button:hover, nav button.active { 
+      color: var(--primary-color); 
+      background: var(--card-bg); 
+      border-color: var(--border-color); 
+    }
+    
+    .theme-toggle { 
+      background: var(--card-bg); 
+      border: 1px solid var(--border-color); 
+      color: var(--text-main); 
+      padding: 6px 10px; 
+      border-radius: 8px; 
+      cursor: pointer; 
+      font-size: 0.9rem; 
+    }
+
+    /* LAYOUT CONTAINERS */
+    .container { max-width: 1000px; margin: 20px auto; padding: 0 14px; }
+    .section { display: none; }
+    .section.active { display: block; }
+
+    /* CARDS & GRID RESPONSIF */
+    .card-grid { 
+      display: grid; 
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); 
+      gap: 14px; 
+      margin-top: 16px; 
+    }
+
+    @media (min-width: 640px) {
+      .card-grid {
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 20px;
+      }
+    }
+
+    .card { 
+      background: var(--card-bg); 
+      border: 1px solid var(--border-color); 
+      padding: 12px; 
+      border-radius: 12px; 
+      text-align: center; 
+      transition: transform 0.2s, border-color 0.2s; 
+      display: flex; 
+      flex-direction: column; 
+      justify-content: space-between; 
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .card h3 { margin-bottom: 6px; color: var(--text-main); font-size: 0.95rem; }
+    .card p.price { font-size: 1.1rem; font-weight: 800; margin-bottom: 10px; color: var(--primary-color); }
+    
+    .product-img-wrapper {
+      position: relative;
+      width: 100%;
+      height: 110px;
+      margin-bottom: 10px;
+    }
+
+    @media (min-width: 640px) {
+      .product-img-wrapper { height: 140px; }
+      .card h3 { font-size: 1.1rem; }
+    }
+
+    .product-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      background-color: var(--input-bg);
+    }
+
+    .expand-btn {
+      position: absolute;
+      bottom: 6px;
+      right: 6px;
+      background: rgba(15, 23, 42, 0.85);
+      color: var(--primary-color);
+      border: 1px solid var(--primary-color);
+      border-radius: 50%;
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 0.75rem;
+      z-index: 5;
+    }
+
+    .card-badge {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      background: rgba(15, 23, 42, 0.8);
+      backdrop-filter: blur(4px);
+      padding: 3px 6px;
+      border-radius: 12px;
+      font-size: 0.65rem;
+      border: 1px solid var(--border-color);
+      z-index: 4;
+    }
+
+    .btn-group { display: flex; flex-direction: column; gap: 6px; }
+    .btn { background: #2563eb; color: white; border: none; padding: 8px 12px; border-radius: 8px; cursor: pointer; font-weight: 700; width: 100%; transition: background 0.2s; text-decoration: none; display: inline-block; text-align: center; font-size: 0.85rem; }
+    .btn:hover { background: #1d4ed8; }
+    .btn-wa { background: #22c55e; color: white; }
+    .btn-wa:hover { background: #16a34a; }
+    .btn-danger { background: #ef4444; padding: 4px 8px; font-size: 0.75rem; width: auto; border-radius: 6px; }
+    .btn-clear { background: #64748b; margin-top: 10px; font-size: 0.85rem; padding: 6px 12px; }
+
+    /* SEARCH BAR */
+    .search-container { margin-bottom: 16px; }
+    .search-input { width: 100%; padding: 10px 14px; background: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-main); border-radius: 8px; font-size: 0.9rem; }
+
+    /* TABEL SCROLL RESPONSIF */
+    .table-responsive {
+      width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      margin-top: 16px;
+      border-radius: 10px;
+      border: 1px solid var(--border-color);
+    }
+
+    table { width: 100%; border-collapse: collapse; background: var(--card-bg); min-width: 320px; }
+    th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border-color); font-size: 0.85rem; }
+    th { background: var(--input-bg); color: var(--primary-color); font-weight: 700; }
+    input, textarea, select { width: 100%; padding: 10px; margin-top: 4px; margin-bottom: 12px; background: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-main); border-radius: 8px; outline: none; font-size: 0.9rem; }
+    
+    .qris-box { background: var(--card-bg); padding: 16px; border-radius: 12px; text-align: center; margin-top: 16px; border: 2px dashed var(--primary-color); }
+
+    .coupon-box { display: flex; gap: 6px; margin-top: 8px; margin-bottom: 12px; }
+    .coupon-box input { margin: 0; }
+    .coupon-box button { width: auto; white-space: nowrap; }
+
+    /* MINI GAME SPIN WHEEL RESPONSIF */
+    .minigame-card {
+      background: var(--card-bg);
+      border: 2px solid var(--neon-pink);
+      border-radius: 14px;
+      padding: 20px 14px;
+      text-align: center;
+      box-shadow: 0 0 15px rgba(255, 0, 127, 0.2);
+    }
+    .wheel-container {
+      position: relative;
+      width: 180px;
+      height: 180px;
+      margin: 16px auto;
+    }
+    .wheel {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      border: 4px solid var(--primary-color);
+      background: conic-gradient(
+        #ff007f 0deg 90deg,
+        #38bdf8 90deg 180deg,
+        #eab308 180deg 270deg,
+        #22c55e 270deg 360deg
+      );
+      transition: transform 4s cubic-bezier(0.15, 0.75, 0.1, 1);
+    }
+    .wheel-pointer {
+      position: absolute;
+      top: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0; height: 0;
+      border-left: 8px solid transparent;
+      border-right: 8px solid transparent;
+      border-top: 16px solid #ffffff;
+      z-index: 10;
+    }
+    .btn-spin {
+      background: var(--neon-pink);
+      color: white;
+      border: none;
+      padding: 10px 24px;
+      font-weight: 800;
+      border-radius: 50px;
+      cursor: pointer;
+      font-size: 0.95rem;
+    }
+
+    /* TESTIMONI */
+    .testi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-top: 16px; }
+    .testi-card { background: var(--input-bg); border-left: 4px solid var(--primary-color); padding: 12px; border-radius: 8px; text-align: left; }
+    .testi-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; font-weight: bold; font-size: 0.85rem; }
+
+    /* MODAL RESPONSIF MOBILE */
+    .modal-overlay { 
+      position: fixed; 
+      top: 0; left: 0; 
+      width: 100%; height: 100%; 
+      background: rgba(0,0,0,0.85); 
+      backdrop-filter: blur(5px); 
+      z-index: 2000; 
+      display: none; 
+      justify-content: center; 
+      align-items: center; 
+      padding: 14px; 
+    }
+    .receipt-card { 
+      background: #ffffff; 
+      color: #000000; 
+      padding: 18px; 
+      border-radius: 12px; 
+      width: 100%; 
+      max-width: 360px; /* Lebar diperbesar sedikit agar muat QR besar */
+      font-family: 'Courier New', Courier, monospace; 
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
+      max-height: 85vh; 
+      overflow-y: auto; 
+    }
+    .receipt-header { text-align: center; border-bottom: 2px dashed #000; padding-bottom: 8px; margin-bottom: 12px; }
+    .receipt-qris { text-align: center; border-top: 2px dashed #000; padding-top: 12px; margin-top: 12px; }
+    
+    /* PENYESUAIAN UKURAN GAMBAR QR STRUK (DIPERBESAR JADI 180px) */
+    .receipt-qris img { 
+      width: 180px; 
+      height: 180px; 
+      object-fit: contain; 
+      border: 1px solid #ddd;
+      padding: 4px;
+      border-radius: 6px;
+      background: #fff;
+    }
+
+    .modal-img-content {
+      max-width: 95%;
+      max-height: 75vh;
+      border: 2px solid var(--primary-color);
+      border-radius: 8px;
+    }
+
+    .receipt-actions { display: flex; flex-direction: column; gap: 6px; margin-top: 12px; }
+    .btn-receipt { padding: 8px; font-weight: bold; border: none; cursor: pointer; border-radius: 6px; font-size: 0.8rem; }
+    .btn-receipt.print { background: #000; color: #fff; }
+    .btn-receipt.edit { background: #eab308; color: #000; }
+    .btn-receipt.finish { background: #22c55e; color: #fff; }
+    .btn-receipt.wa { background: #25d366; color: #fff; }
+
+    /* LYFZ AI (L.A) FLOATING WIDGET & CHAT STYLES */
+    .lyfz-ai-trigger {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: linear-gradient(135deg, #38bdf8, #ff007f);
+      color: white;
+      border: none;
+      padding: 12px 18px;
+      border-radius: 50px;
+      font-weight: 800;
+      font-size: 0.9rem;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(56, 189, 248, 0.4);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .lyfz-ai-trigger:hover {
+      transform: translateY(-3px) scale(1.03);
+      box-shadow: 0 6px 20px rgba(255, 0, 127, 0.5);
+    }
+
+    .lyfz-ai-box {
+      position: fixed;
+      bottom: 80px;
+      right: 20px;
+      width: 320px;
+      max-width: calc(100vw - 40px);
+      height: 420px;
+      background: var(--card-bg);
+      border: 2px solid var(--primary-color);
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      z-index: 1001;
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+      animation: popupSlide 0.3s ease-out;
+    }
+
+    @keyframes popupSlide {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .lyfz-ai-header {
+      background: var(--input-bg);
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .lyfz-ai-header h3 {
+      font-size: 0.95rem;
+      color: var(--primary-color);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .lyfz-ai-close {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.2rem;
+      cursor: pointer;
+    }
+
+    .lyfz-ai-body {
+      flex: 1;
+      padding: 12px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .la-msg {
+      max-width: 85%;
+      padding: 8px 12px;
+      border-radius: 12px;
+      font-size: 0.82rem;
+      line-height: 1.4;
+      white-space: pre-line;
+    }
+
+    .la-msg.bot {
+      background: var(--input-bg);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      align-self: flex-start;
+      border-bottom-left-radius: 2px;
+    }
+
+    .la-msg.user {
+      background: var(--primary-color);
+      color: #000;
+      font-weight: 600;
+      align-self: flex-end;
+      border-bottom-right-radius: 2px;
+    }
+
+    .lyfz-ai-footer {
+      padding: 8px;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      gap: 6px;
+      background: var(--card-bg);
+    }
+
+    .lyfz-ai-footer input {
+      margin: 0;
+      padding: 8px 12px;
+      font-size: 0.8rem;
+    }
+
+    .lyfz-ai-footer button {
+      width: auto;
+      padding: 8px 14px;
+      font-size: 0.8rem;
+    }
+
+    @media print {
+      body * { visibility: hidden; }
+      #receiptModal, #receiptModal * { visibility: visible; }
+      #receiptModal { position: absolute; left: 0; top: 0; width: 100%; height: 100%; background: none; }
+      .receipt-actions, .lyfz-ai-trigger, .lyfz-ai-box { display: none !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER NAVBAR -->
+  <header>
+    <div class="logo">⚡ LyfzStore ✨</div>
+    <nav>
+      <button onclick="showSection('landing')" class="active" id="nav-landing">Home</button>
+      <button onclick="showSection('katalog')" id="nav-katalog">Katalog</button>
+      <button onclick="showSection('topup')" id="nav-topup">Top Up</button>
+      <button onclick="showSection('minigame')" id="nav-minigame">Mini Game 🎮</button>
+      <button onclick="showSection('kasir')" id="nav-kasir">Kasir (<span id="cart-count">0</span>)</button>
+      <button onclick="showSection('testimoni')" id="nav-testimoni">Ulasan ⭐</button>
+      <button onclick="showSection('history')" id="nav-history">Riwayat</button>
+      <button class="theme-toggle" onclick="toggleTheme()" title="Ganti Tema">🌙 / ☀️</button>
+    </nav>
+  </header>
+
+  <div class="container">
+    
+    <!-- SECTION 1: LANDING PAGE -->
+    <div id="landing" class="section active">
+      <div style="text-align: center; padding: 40px 0;">
+        <h1 style="font-size: 2rem; margin-bottom: 12px;">Selamat Datang di <span class="neon-title">⚡ LyfzStore ✨</span></h1>
+        <p style="color: var(--text-muted); font-size: 1rem; margin-bottom: 24px;">🎮 Toko Digital Gaming • Amanah • Murah • Berkualitas ⚡</p>
+        <button class="btn" style="width: auto; padding: 12px 28px; font-size: 1rem;" onclick="showSection('katalog')">🛒 Berbelanja Sekarang</button>
+      </div>
+    </div>
+
+    <!-- SECTION 2: KATALOG PRODUK -->
+    <div id="katalog" class="section">
+      <h2 class="neon-title" style="font-size:1.3rem;">📦 Katalog Produk Digital ✨</h2>
+      
+      <div class="search-container" style="margin-top: 12px;">
+        <input type="text" class="search-input" id="searchKatalog" placeholder="🔍 Cari nama produk di katalog..." onkeyup="filterKatalog()">
+      </div>
+
+      <div class="card-grid" id="katalogGrid">
+        
+        <!-- 1. AKUN FREE FIRE SULTAN -->
+        <div class="card product-card" data-title="akun free fire sultan ff">
+          <div class="card-badge">🔥 TOP FF</div>
+          <div>
+            <div class="product-img-wrapper">
+              <img src="akunffsultan.jpg" alt="Spek Akun FF Sultan" class="product-img" onerror="this.src='https://via.placeholder.com/300x140/1e293b/38bdf8?text=Spek+FF+Sultan+⚡'">
+              <button class="expand-btn" onclick="openFullImage('akunffsultan.jpg', 'Detail Spesifikasi & Vault Akun Free Fire Sultan')" title="Perbesar Gambar Spesifikasi">🔍</button>
+            </div>
+            <h3 style="text-align: left;">Akun FF Sultan ✨</h3>
+            <p style="color:var(--text-muted); font-size:0.75rem; text-align:left; margin-bottom:8px;">Vault rame, skin senjata, opm x riper, bundle langka.</p>
+            <p class="price">Rp1.200.000</p>
+          </div>
+          <div class="btn-group">
+            <button class="btn" onclick="addToCart('Akun Free Fire Sultan', 1200000)">+ Ke Kasir</button>
+          </div>
+        </div>
+
+        <!-- 2. AKUN FREE FIRE BIASA -->
+        <div class="card product-card" data-title="akun free fire biasa ff">
+          <div class="card-badge">⚡ FF Regular</div>
+          <div>
+            <div class="product-img-wrapper">
+              <img src="akunffnormal.jpg" alt="Spek Akun FF Biasa" class="product-img" onerror="this.src='https://via.placeholder.com/300x140/1e293b/38bdf8?text=Spek+FF+Biasa+🎮'">
+              <button class="expand-btn" onclick="openFullImage('akunffnormal.jpg', 'Detail Spesifikasi Akun Free Fire Biasa')" title="Perbesar Gambar Spesifikasi">🔍</button>
+            </div>
+            <h3 style="text-align: left;">Akun FF Biasa</h3>
+            <p style="color:var(--text-muted); font-size:0.75rem; text-align:left; margin-bottom:8px;">Vault lumayan, sg2 lumut & evo level 4.</p>
+            <p class="price">Rp120.000</p>
+          </div>
+          <div class="btn-group">
+            <button class="btn" onclick="addToCart('Akun Free Fire Biasa', 120000)">+ Ke Kasir</button>
+          </div>
+        </div>
+
+        <!-- 3. AKUN MOBILE LEGENDS SULTAN -->
+        <div class="card product-card" data-title="akun mobile legends sultan ml">
+          <div class="card-badge">👑 TOP MLBB</div>
+          <div>
+            <div class="product-img-wrapper">
+              <img src="akunmlsultan.jpg" alt="Spek Akun ML Sultan" class="product-img" onerror="this.src='https://via.placeholder.com/300x140/1e293b/38bdf8?text=Spek+ML+Sultan+👑'">
+              <button class="expand-btn" onclick="openFullImage('akunmlsultan.jpg', 'Detail Spesifikasi & Skin Kolektor MLBB Sultan')" title="Perbesar Gambar Spesifikasi">🔍</button>
+            </div>
+            <h3 style="text-align: left;">Akun ML Sultan ✨</h3>
+            <p style="color:var(--text-muted); font-size:0.75rem; text-align:left; margin-bottom:8px;">Collector Sultan skin melimpah, WR tinggi.</p>
+            <p class="price">Rp1.500.000</p>
+          </div>
+          <div class="btn-group">
+            <button class="btn" onclick="addToCart('Akun Mobile Legends Sultan', 1500000)">+ Ke Kasir</button>
+          </div>
+        </div>
+
+        <!-- 4. AKUN MOBILE LEGENDS BIASA -->
+        <div class="card product-card" data-title="akun mobile legends biasa ml">
+          <div class="card-badge">⚔️ MLBB Regular</div>
+          <div>
+            <div class="product-img-wrapper">
+              <img src="akunmlbiasa.jpg" alt="Spek Akun ML Biasa" class="product-img" onerror="this.src='https://via.placeholder.com/300x140/1e293b/38bdf8?text=Spek+ML+Biasa+⚔️'">
+              <button class="expand-btn" onclick="openFullImage('akunmlbiasa.jpg', 'Detail Spesifikasi Akun Mobile Legends Biasa')" title="Perbesar Gambar Spesifikasi">🔍</button>
+            </div>
+            <h3 style="text-align: left;">Akun ML Biasa</h3>
+            <p style="color:var(--text-muted); font-size:0.75rem; text-align:left; margin-bottom:8px;">Skin lumayan banyak dan keren.</p>
+            <p class="price">Rp150.000</p>
+          </div>
+          <div class="btn-group">
+            <button class="btn" onclick="addToCart('Akun Mobile Legends Biasa', 150000)">+ Ke Kasir</button>
+          </div>
+        </div>
+
+        <!-- 5. JASA ORDER LOGO CUSTOM -->
+        <div class="card product-card" data-title="jasa order logo custom nama mu">
+          <div class="card-badge">🎨 Creative</div>
+          <div>
+            <h3 style="text-align: left;">Jasa Logo Custom</h3>
+            <p style="color:var(--text-muted); font-size:0.75rem; text-align:left; margin-bottom:8px;">Desain logo personal / squad kamu.</p>
+            <p class="price">Rp3.000</p>
+          </div>
+          <div class="btn-group">
+            <button class="btn" onclick="addToCart('Jasa Order Logo Custom Nama mu', 3000)">+ Ke Kasir</button>
+          </div>
+        </div>
+
+        <!-- 6. JASA SPAM KODE OTP / BOT WA -->
+        <div class="card product-card" data-title="jasa spam kode otp ke nomor whatsapp">
+          <div class="card-badge" style="background:#22c55e; color:#000; font-weight:800;">🤖 POPULER</div>
+          <div>
+            <h3 style="text-align: left;">Jasa OTP / Bot WA</h3>
+            <p style="color:var(--text-muted); font-size:0.75rem; text-align:left; margin-bottom:8px;">Bot CS otomatis untuk toko online / grup.</p>
+            <p class="price">Rp3.000</p>
+          </div>
+          <div class="btn-group">
+            <button class="btn btn-wa" onclick="orderWA('Jasa Setting Bot WhatsApp', 3000)">💬 Order WA</button>
+            <button class="btn" onclick="addToCart('Jasa Spam Kode OTP WhatsApp', 3000)">+ Ke Kasir</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- SECTION 3: TOP UP GAME -->
+    <div id="topup" class="section">
+      <h2 class="neon-title" style="font-size:1.3rem;">💎 Top Up Free Fire Direct ✨</h2>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-badge">💎 12 DM</div>
+          <h3>12 Diamond</h3>
+          <p class="price">Rp2.000</p>
+          <button class="btn" onclick="selectTopUp('12 Diamond', 2000)">Pilih Item</button>
+        </div>
+        <div class="card">
+          <div class="card-badge">💎 50 DM</div>
+          <h3>50 Diamond</h3>
+          <p class="price">Rp8.000</p>
+          <button class="btn" onclick="selectTopUp('50 Diamond', 8000)">Pilih Item</button>
+        </div>
+        <div class="card">
+          <div class="card-badge">💎 70 DM</div>
+          <h3>70 Diamond</h3>
+          <p class="price">Rp10.000</p>
+          <button class="btn" onclick="selectTopUp('70 Diamond', 10000)">Pilih Item</button>
+        </div>
+      </div>
+
+      <div class="qris-box" id="qrisBox" style="display:none;">
+        <h3 id="selectedTopUpTitle" style="color:var(--primary-color); margin-bottom:10px; font-size:1.1rem;">Pembayaran Top Up</h3>
+        
+        <div style="max-width: 380px; margin: 0 auto 12px auto; text-align: left;">
+          <label style="font-size:0.8rem; font-weight: bold;">User ID Game Free Fire:</label>
+          <input type="number" id="topupUserId" placeholder="Contoh: 123456789" oninput="updateTopUpWALink()">
+        </div>
+
+        <p style="color:var(--text-muted); margin-bottom:12px; font-size: 0.8rem;">Isi ID di atas, lalu klik tombol untuk kirim format transaksi via WA!</p>
+        
+        <a id="waTopUpBtn" href="#" target="_blank" class="btn btn-wa" style="max-width:320px;">💬 Konfirmasi via WhatsApp</a>
+      </div>
+
+      <div style="margin-top: 24px; text-align: center; background: var(--card-bg); padding: 16px; border-radius: 12px; border: 1px solid var(--border-color);">
+        <p style="color: var(--text-muted); font-size: 0.85rem;">Pilihan / game top up gak ada di daftar?</p>
+        <a href="https://www.unipin.com/" target="_blank" style="color: var(--primary-color); font-weight: bold; text-decoration: none; display: inline-block; margin-top: 6px; font-size: 0.9rem;">
+          Gak ada pilihan top up game mu disini? Langsung aja ke Website UniPin ➔
+        </a>
+      </div>
+    </div>
+
+    <!-- SECTION 4: MINI GAME -->
+    <div id="minigame" class="section">
+      <h2 class="neon-title" style="font-size:1.3rem;">🎮 Roda Keberuntungan Diskon ✨</h2>
+      <p style="color:var(--text-muted); margin-top:4px; margin-bottom:16px; font-size:0.85rem;">Putar rodanya dan dapatkan kode kupon diskon!</p>
+      
+      <div class="minigame-card" style="max-width: 360px; margin: 0 auto;">
+        <h3>Lucky Spin Diskon</h3>
+        <div class="wheel-container">
+          <div class="wheel-pointer"></div>
+          <div class="wheel" id="wheel"></div>
+        </div>
+        <button class="btn-spin" onclick="spinWheel()">🎲 PUTAR RODA!</button>
+        <p id="spinResult" style="margin-top: 14px; font-weight: bold; color: var(--primary-color); font-size: 0.95rem;"></p>
+      </div>
+    </div>
+
+    <!-- SECTION 5: KASIR & STRUK -->
+    <div id="kasir" class="section">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+        <h2 class="neon-title" style="font-size:1.3rem;">🛒 Kasir & Pembayaran ✨</h2>
+        <button class="btn btn-clear" id="btnClearCart" onclick="clearCart()" style="display:none;">🗑 Kosongkan</button>
+      </div>
+      
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th>Item Produk</th>
+              <th>Harga</th>
+              <th style="width: 80px; text-align: center;">Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="cart-table">
+            <tr><td colspan="3" style="text-align:center; color:var(--text-muted);">Keranjang belanja masih kosong</td></tr>
+          </tbody>
+        </table>
+      </div>
+      
+      <div style="margin-top: 20px; background: var(--card-bg); padding: 16px; border-radius: 12px; border: 1px solid var(--border-color);">
+        <label style="font-weight:600; font-size:0.85rem;">Kode Promo / Diskon:</label>
+        <div class="coupon-box">
+          <input type="text" id="couponCode" placeholder="Contoh: LYFZSTORE">
+          <button class="btn" style="padding:8px 14px;" onclick="applyCoupon()">Kupon</button>
+        </div>
+        <p id="couponMsg" style="font-size:0.75rem; margin-top:-8px; margin-bottom:10px;"></p>
+
+        <h3 style="font-size:1.2rem;">Total Tagihan: <span style="color:var(--primary-color);">Rp<span id="total-price">0</span></span></h3>
+        <p id="discountInfo" style="color:#22c55e; font-size:0.85rem; display:none;">Diskon: Rp<span id="discountAmount">0</span></p>
+
+        <label style="margin-top:12px; display:block; font-weight:600; font-size:0.85rem;">Nominal Dibayar (Rp):</label>
+        <input type="number" id="payAmount" placeholder="Contoh: 50000" oninput="calcChange()">
+        <h4 style="font-size:1.1rem; margin-top:6px;">Kembalian: <span style="color:#facc15;">Rp<span id="changeAmount">0</span></span></h4>
+        <button class="btn" style="margin-top: 14px;" onclick="generateReceipt()">Cetak Struk / Preview</button>
+      </div>
+    </div>
+
+    <!-- SECTION 6: TESTIMONI / KOMENTAR PENGUNJUNG -->
+    <div id="testimoni" class="section">
+      <h2 class="neon-title" style="font-size:1.3rem;">⭐ Komentar & Testimoni ✨</h2>
+      <p style="color:var(--text-muted); margin-top:4px; margin-bottom:16px; font-size:0.85rem;">Bagikan ulasan layanan di LyfzStore!</p>
+
+      <div style="background: var(--card-bg); padding: 16px; border-radius: 12px; border: 1px solid var(--border-color); margin-bottom: 20px;">
+        <h3 style="margin-bottom: 10px; font-size: 1rem;">Tulis Ulasan:</h3>
+        <input type="text" id="testiName" placeholder="Nama / Nickname Kamu">
+        <select id="testiRating">
+          <option value="⭐⭐⭐⭐⭐">⭐⭐⭐⭐⭐ - Sangat Puas</option>
+          <option value="⭐⭐⭐⭐">⭐⭐⭐⭐ - Bagus</option>
+          <option value="⭐⭐⭐">⭐⭐⭐ - Cukup</option>
+        </select>
+        <textarea id="testiComment" rows="3" placeholder="Tulis komentar..."></textarea>
+        <button class="btn" onclick="submitTestimonial()">Kirim Ulasan</button>
+      </div>
+
+      <div class="testi-grid" id="testiList"></div>
+    </div>
+
+    <!-- SECTION 7: RIWAYAT TRANSAKSI -->
+    <div id="history" class="section">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+        <h2 class="neon-title" style="font-size:1.3rem;">📊 Riwayat Kasir ✨</h2>
+        <button class="btn btn-clear" onclick="clearHistory()">🗑️ Hapus</button>
+      </div>
+      
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th>Waktu & Tanggal</th>
+              <th>Daftar Item</th>
+              <th>Total Bayar</th>
+            </tr>
+          </thead>
+          <tbody id="history-table">
+            <tr><td colspan="3" style="text-align:center; color:var(--text-muted);">Belum ada riwayat transaksi</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+ <!-- MODAL STRUK DIGITAL -->
+<div class="modal-overlay" id="receiptModal">
+    <div class="receipt-card">
+        <div class="receipt-header">
+            <h2>LYFZSTORE</h2>
+            <p style="font-size:0.75rem;">Amanah • Murah • Berkualitas</p>
+            <p style="font-size:0.7rem; margin-top:4px;" id="receiptDate"></p>
+        </div>
+        <div id="receiptItems" style="font-size:0.8rem; margin-bottom:8px;"></div>
+        <div style="border-top:1px dashed #000; padding-top:6px; font-size:0.8rem;" id="receiptTotals"></div>
+
+        <div class="receipt-qris">
+            <p style="font-weight:bold; font-size:0.75rem; margin-bottom:4px;">GRUP JB WHATSAPP</p>
+            <img src="QRgb.jpg" alt="QR Grup JB WA" style="width:275px; height:auto; display:block; margin:0 auto;" onerror="this.src='https://via.placeholder.com/275?text=QR+Grup+JB'">
+            <p style="font-size:0.7rem; margin-top:4px;">Scan untuk gabung grup JB</p>
+        </div>
+
+        <div class="receipt-actions">
+            <button onclick="sendReceiptToWA()" class="btn-receipt wa">💬 Kirim Struk via WA</button>
+            <button onclick="printReceipt()" class="btn-receipt print">🖨️ Cetak Struk</button>
+            <button onclick="closeReceiptAndEdit()" class="btn-receipt edit">⬅️ Edit / Kembali</button>
+            <button onclick="finishAndResetReceipt()" class="btn-receipt finish">✅ Transaksi Baru</button>
+        </div>
+    </div>
+</div>
+
+  <!-- MODAL GAMBAR FULL -->
+  <div class="modal-overlay" id="fullImgModal" onclick="closeFullImage()">
+    <div style="text-align:center; width: 100%;" onclick="event.stopPropagation()">
+      <img src="" id="modalImgSrc" class="modal-img-content">
+      <h3 id="modalImgCaption" style="color:#ffffff; margin-top:10px; font-size:0.9rem;"></h3>
+      <button class="btn" style="width: auto; margin-top: 10px; padding: 6px 20px;" onclick="closeFullImage()">Tutup</button>
+    </div>
+  </div>
+
+  <!-- LYFZ AI (L.A) FLOATING WIDGET & CHAT MODAL -->
+  <button class="lyfz-ai-trigger" onclick="toggleLyfzAI()">
+    🤖 <span>L.A AI</span>
+  </button>
+
+  <div class="lyfz-ai-box" id="lyfzAiBox">
+    <div class="lyfz-ai-header">
+      <h3>🤖 Lyfz AI Assistant</h3>
+      <button class="lyfz-ai-close" onclick="toggleLyfzAI()">✕</button>
+    </div>
+    <div class="lyfz-ai-body" id="lyfzAiBody">
+      <div class="la-msg bot">
+        Halo! Aku <b>L.A (Lyfz AI)</b> 🤖✨ Ada yang bisa aku bantu seputar stok akun, top up, atau transaksi hari ini?
+      </div>
+    </div>
+    <div class="lyfz-ai-footer">
+      <input type="text" id="lyfzAiInput" placeholder="Tanya L.A di sini..." onkeypress="handleLAKeyPress(event)">
+      <button class="btn" onclick="sendLAMessage()">Kirim</button>
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT LOGIC FULL -->
+  <script>
+    let cart = [];
+    let currentDiscount = 0;
+    let selectedTopUpData = { title: '', price: 0 };
+    const ADMIN_WA = "6283196587229";
+
+    window.onload = function() {
+      loadHistory();
+      loadTestimonials();
+    };
+
+    function toggleTheme() {
+      document.body.classList.toggle('light-mode');
+    }
+
+    function showSection(id) {
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      document.getElementById('nav-' + id).classList.add('active');
+    }
+
+    function filterKatalog() {
+      let query = document.getElementById('searchKatalog').value.toLowerCase();
+      let cards = document.querySelectorAll('.product-card');
+
+      cards.forEach(card => {
+        let title = card.getAttribute('data-title');
+        if(title.includes(query)) {
+          card.style.display = 'flex';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+
+    function orderWA(item, price) {
+      let message = `Halo Admin LyfzStore! Saya ingin memesan produk/jasa berikut:\n- Nama Layanan: ${item}\n- Harga: Rp${price.toLocaleString('id-ID')}\nMohon petunjuk transaksi selanjutnya ya, terima kasih!`;
+      let url = `https://wa.me/${ADMIN_WA}?text=${encodeURIComponent(message)}`;
+      window.open(url, '_blank');
+    }
+
+    function addToCart(item, price) {
+      cart.push({ item, price });
+      updateCartUI();
+      alert(item + ' berhasil ditambahkan ke kasir!');
+    }
+
+    function removeFromCart(index) {
+      cart.splice(index, 1);
+      updateCartUI();
+    }
+
+    function clearCart() {
+      if(confirm('Apakah Anda yakin ingin mengosongkan seluruh keranjang kasir?')) {
+        cart = [];
+        currentDiscount = 0;
+        document.getElementById('couponCode').value = '';
+        document.getElementById('couponMsg').innerText = '';
+        document.getElementById('discountInfo').style.display = 'none';
+        updateCartUI();
+      }
+    }
+
+    function applyCoupon() {
+      let code = document.getElementById('couponCode').value.trim().toUpperCase();
+      let msg = document.getElementById('couponMsg');
+      let totalRaw = cart.reduce((sum, c) => sum + c.price, 0);
+
+      if(totalRaw === 0) {
+        msg.style.color = '#ef4444';
+        msg.innerText = 'Keranjang masih kosong!';
+        return;
+      }
+
+      if(code === 'LYFZSTORE') {
+        currentDiscount = Math.round(totalRaw * 0.30);
+        msg.style.color = '#22c55e';
+        msg.innerText = 'Kupon LYFZSTORE dipasang! (30%)';
+      } else if(code === 'LYFZSHOP') {
+        currentDiscount = Math.round(totalRaw * 0.50);
+        msg.style.color = '#22c55e';
+        msg.innerText = 'Kupon LYFZSHOP dipasang! (50%)';
+      } else if(code === 'LYFZKECE') {
+        currentDiscount = Math.round(totalRaw * 0.70);
+        msg.style.color = '#22c55e';
+        msg.innerText = 'Kupon LYFZKECE dipasang! (70%)';
+      } else {
+        currentDiscount = 0;
+        msg.style.color = '#ef4444';
+        msg.innerText = 'Kode kupon salah!';
+      }
+      updateCartUI();
+    }
+
+    function updateCartUI() {
+      document.getElementById('cart-count').innerText = cart.length;
+      let tbody = document.getElementById('cart-table');
+      let clearBtn = document.getElementById('btnClearCart');
+      
+      if(cart.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:var(--text-muted);">Keranjang belanja masih kosong</td></tr>';
+        clearBtn.style.display = 'none';
+        document.getElementById('total-price').innerText = '0';
+        document.getElementById('changeAmount').innerText = '0';
+        return;
+      }
+
+      clearBtn.style.display = 'inline-block';
+      tbody.innerHTML = '';
+      let totalRaw = 0;
+
+      cart.forEach((c, i) => {
+        totalRaw += c.price;
+        tbody.innerHTML += `
+          <tr>
+            <td>${c.item}</td>
+            <td>Rp${c.price.toLocaleString('id-ID')}</td>
+            <td style="text-align:center;"><button class="btn btn-danger" onclick="removeFromCart(${i})">Hapus</button></td>
+          </tr>
+        `;
+      });
+
+      let finalTotal = Math.max(0, totalRaw - currentDiscount);
+      document.getElementById('total-price').innerText = finalTotal.toLocaleString('id-ID');
+      
+      if(currentDiscount > 0) {
+        document.getElementById('discountInfo').style.display = 'block';
+        document.getElementById('discountAmount').innerText = currentDiscount.toLocaleString('id-ID');
+      } else {
+        document.getElementById('discountInfo').style.display = 'none';
+      }
+
+      calcChange();
+    }
+
+    function calcChange() {
+      let totalRaw = cart.reduce((sum, c) => sum + c.price, 0);
+      let finalTotal = Math.max(0, totalRaw - currentDiscount);
+      let pay = parseFloat(document.getElementById('payAmount').value) || 0;
+      let change = pay - finalTotal;
+      document.getElementById('changeAmount').innerText = change >= 0 ? change.toLocaleString('id-ID') : '0';
+    }
+
+    function selectTopUp(title, price) {
+      selectedTopUpData = { title, price };
+      document.getElementById('selectedTopUpTitle').innerText = `Pembayaran: ${title} (Rp${price.toLocaleString('id-ID')})`;
+      document.getElementById('qrisBox').style.display = 'block';
+      updateTopUpWALink();
+    }
+
+    function updateTopUpWALink() {
+      let userId = document.getElementById('topupUserId').value.trim();
+      let msg = `Halo Admin LyfzStore! Saya mau Top Up Free Fire:\n- Paket: ${selectedTopUpData.title}\n- Harga: Rp${selectedTopUpData.price.toLocaleString('id-ID')}\n- User ID: ${userId || '[Belum diisi]'}\nMohon diproses ya!`;
+      document.getElementById('waTopUpBtn').href = `https://wa.me/${ADMIN_WA}?text=${encodeURIComponent(msg)}`;
+    }
+
+    function spinWheel() {
+      let wheel = document.getElementById('wheel');
+      let res = document.getElementById('spinResult');
+      let deg = Math.floor(2000 + Math.random() * 2000);
+      wheel.style.transform = `rotate(${deg}deg)`;
+
+      res.innerText = "Memutar roda keberuntungan...";
+      setTimeout(() => {
+        let coupons = [
+          { code: 'LYFZSTORE', desc: 'Diskon 30%' },
+          { code: 'LYFZSHOP', desc: 'Diskon 50%' },
+          { code: 'LYFZKECE', desc: 'Diskon 70%' }
+        ];
+        let win = coupons[Math.floor(Math.random() * coupons.length)];
+        res.innerHTML = `🎉 Selamat! Kamu dapet Kode Kupon: <b>${win.code}</b> (${win.desc})! Salin kode ini di kasir ya!`;
+      }, 4000);
+    }
+
+    function submitTestimonial() {
+      let name = document.getElementById('testiName').value.trim() || 'Anonim';
+      let rating = document.getElementById('testiRating').value;
+      let comment = document.getElementById('testiComment').value.trim();
+
+      if(!comment) {
+        alert('Tulis komentar ulasan kamu dulu ya!');
+        return;
+      }
+
+      let testimonials = JSON.parse(localStorage.getItem('lyfz_testi') || '[]');
+      testimonials.unshift({ name, rating, comment, date: new Date().toLocaleDateString('id-ID') });
+      localStorage.setItem('lyfz_testi', JSON.stringify(testimonials));
+
+      document.getElementById('testiName').value = '';
+      document.getElementById('testiComment').value = '';
+      loadTestimonials();
+      alert('Terima kasih atas ulasannya!');
+    }
+
+    function loadTestimonials() {
+      let testimonials = JSON.parse(localStorage.getItem('lyfz_testi') || '[]');
+      let list = document.getElementById('testiList');
+      
+      if(testimonials.length === 0) {
+        list.innerHTML = '<p style="color:var(--text-muted); font-size:0.85rem;">Belum ada ulasan. Jadi yang pertama memberi ulasan!</p>';
+        return;
+      }
+
+      list.innerHTML = testimonials.map(t => `
+        <div class="testi-card">
+          <div class="testi-header">
+            <span>👤 ${t.name}</span>
+            <span style="color:#facc15;">${t.rating}</span>
+          </div>
+          <p style="font-size:0.8rem; color:var(--text-main); margin-bottom:4px;">"${t.comment}"</p>
+          <small style="color:var(--text-muted); font-size:0.7rem;">${t.date}</small>
+        </div>
+      `).join('');
+    }
+
+    function generateReceipt() {
+      if(cart.length === 0) {
+        alert('Keranjang kasir masih kosong!');
+        return;
+      }
+
+      let now = new Date();
+      document.getElementById('receiptDate').innerText = now.toLocaleString('id-ID');
+
+      let itemsHtml = '';
+      let totalRaw = 0;
+      cart.forEach(c => {
+        totalRaw += c.price;
+        itemsHtml += `<div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+          <span>${c.item}</span>
+          <span>Rp${c.price.toLocaleString('id-ID')}</span>
+        </div>`;
+      });
+
+      document.getElementById('receiptItems').innerHTML = itemsHtml;
+
+      let finalTotal = Math.max(0, totalRaw - currentDiscount);
+      let pay = parseFloat(document.getElementById('payAmount').value) || 0;
+      let change = pay - finalTotal;
+
+      document.getElementById('receiptTotals').innerHTML = `
+        <div style="display:flex; justify-content:space-between;"><span>Subtotal:</span><span>Rp${totalRaw.toLocaleString('id-ID')}</span></div>
+        ${currentDiscount > 0 ? `<div style="display:flex; justify-content:space-between; color:red;"><span>Diskon:</span><span>-Rp${currentDiscount.toLocaleString('id-ID')}</span></div>` : ''}
+        <div style="display:flex; justify-content:space-between; font-weight:bold; font-size:0.9rem; margin-top:4px;"><span>Total:</span><span>Rp${finalTotal.toLocaleString('id-ID')}</span></div>
+        <div style="display:flex; justify-content:space-between; margin-top:4px;"><span>Bayar:</span><span>Rp${pay.toLocaleString('id-ID')}</span></div>
+        <div style="display:flex; justify-content:space-between;"><span>Kembali:</span><span>Rp${change >= 0 ? change.toLocaleString('id-ID') : 0}</span></div>
+      `;
+
+      document.getElementById('receiptModal').style.display = 'flex';
+    }
+
+    function sendReceiptToWA() {
+      let totalRaw = cart.reduce((sum, c) => sum + c.price, 0);
+      let finalTotal = Math.max(0, totalRaw - currentDiscount);
+      let itemsList = cart.map(c => `- ${c.item} (Rp${c.price.toLocaleString('id-ID')})`).join('\n');
+      
+      let msg = `🧾 *STRUK TRANSAKSI LYFZSTORE*\nTanggal: ${new Date().toLocaleString('id-ID')}\n\n*Daftar Item:*\n${itemsList}\n\n*Total Tagihan:* Rp${finalTotal.toLocaleString('id-ID')}\n\nMohon diproses min, terima kasih!`;
+      window.open(`https://wa.me/${ADMIN_WA}?text=${encodeURIComponent(msg)}`, '_blank');
+    }
+
+    function printReceipt() {
+      window.print();
+    }
+
+    function closeReceiptAndEdit() {
+      document.getElementById('receiptModal').style.display = 'none';
+    }
+
+    function finishAndResetReceipt() {
+      let history = JSON.parse(localStorage.getItem('lyfz_history') || '[]');
+      let totalRaw = cart.reduce((sum, c) => sum + c.price, 0);
+      let finalTotal = Math.max(0, totalRaw - currentDiscount);
+      let itemsSummary = cart.map(c => c.item).join(', ');
+
+      history.unshift({
+        date: new Date().toLocaleString('id-ID'),
+        items: itemsSummary,
+        total: finalTotal
+      });
+
+      localStorage.setItem('lyfz_history', JSON.stringify(history));
+      loadHistory();
+
+      cart = [];
+      currentDiscount = 0;
+      document.getElementById('couponCode').value = '';
+      document.getElementById('payAmount').value = '';
+      updateCartUI();
+      document.getElementById('receiptModal').style.display = 'none';
+      alert('Transaksi selesai dan telah disimpan ke riwayat!');
+    }
+
+    function loadHistory() {
+      let history = JSON.parse(localStorage.getItem('lyfz_history') || '[]');
+      let tbody = document.getElementById('history-table');
+
+      if(history.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:var(--text-muted);">Belum ada riwayat transaksi</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = history.map(h => `
+        <tr>
+          <td><small>${h.date}</small></td>
+          <td>${h.items}</td>
+          <td><b>Rp${h.total.toLocaleString('id-ID')}</b></td>
+        </tr>
+      `).join('');
+    }
+
+    function clearHistory() {
+      if(confirm('Hapus seluruh riwayat transaksi?')) {
+        localStorage.removeItem('lyfz_history');
+        loadHistory();
+      }
+    }
+
+    function openFullImage(src, caption) {
+      document.getElementById('modalImgSrc').src = src;
+      document.getElementById('modalImgCaption').innerText = caption;
+      document.getElementById('fullImgModal').style.display = 'flex';
+    }
+
+    function closeFullImage() {
+      document.getElementById('fullImgModal').style.display = 'none';
+    }
+
+    /* LOGIC FITUR LYFZ AI (L.A) ASSISTANT */
+    function toggleLyfzAI() {
+      let box = document.getElementById('lyfzAiBox');
+      if(box.style.display === 'flex') {
+        box.style.display = 'none';
+      } else {
+        box.style.display = 'flex';
+        document.getElementById('lyfzAiInput').focus();
+      }
+    }
+
+    function handleLAKeyPress(e) {
+      if(e.key === 'Enter') {
+        sendLAMessage();
+      }
+    }
+
+    function sendLAMessage() {
+      let input = document.getElementById('lyfzAiInput');
+      let text = input.value.trim();
+      if(!text) return;
+
+      appendLAMessage('user', text);
+      input.value = '';
+
+      setTimeout(() => {
+        let reply = generateLAResponse(text);
+        appendLAMessage('bot', reply);
+      }, 500);
+    }
+
+    function appendLAMessage(sender, text) {
+      let body = document.getElementById('lyfzAiBody');
+      let msgDiv = document.createElement('div');
+      msgDiv.className = `la-msg ${sender}`;
+      msgDiv.innerHTML = text;
+      body.appendChild(msgDiv);
+      body.scrollTop = body.scrollHeight;
+    }
+
+    function generateLAResponse(input) {
+      let text = input.toLowerCase();
+
+      // 1. Amanah / Aman / Keamanan
+      if (text.includes('amanah') || text.includes('aman') || text.includes('keamanan')) {
+        return "LyfzStore 100% Amanah, Aman, dan Terpercaya! Semua akun dan transaksi dijamin garansinya. Kamu juga bisa cek ulasan pembeli di tab 'Ulasan ⭐'.";
+      } 
+      // 2. Bagaimana cara transaksi disini
+      else if (text.includes('transaksi') || text.includes('cara beli') || text.includes('cara belanja')) {
+        return "Cara transaksi gampang banget:\n1. Pilih produk di tab 'Katalog'.\n2. Klik '+ Ke Kasir'.\n3. Buka tab 'Kasir', masukan nominal bayar.\n4. Klik 'Cetak Struk / Preview' dan kirim struknya ke WhatsApp Admin!";
+      } 
+      // 3. Cara top up
+      else if (text.includes('top up') || text.includes('topup') || text.includes('diamond')) {
+        return "Cara top up:\n1. Masuk ke tab 'Top Up'.\n2. Pilih nominal Diamond yang kamu mau.\n3. Masukkan User ID Game kamu pada kolom yang tersedia.\n4. Klik tombol '💬 Konfirmasi via WhatsApp' untuk lanjut bayar ke Admin.";
+      } 
+      // 4. List menu
+      else if (text.includes('list menu') || text.includes('menu') || text.includes('katalog') || text.includes('daftar produk')) {
+        return "Menu LyfzStore:\n- Akun Free Fire (Sultan & Biasa)\n- Akun Mobile Legends (Sultan & Biasa)\n- Jasa Logo Custom\n- Jasa Spam Kode OTP / Bot WA\n- Top Up Diamond FF Direct";
+      } 
+      // 5. Cara menggunakan kupon
+      else if (text.includes('kupon') || text.includes('diskon') || text.includes('promo')) {
+        return "Cara pakai kupon:\n1. Dapatkan kode dari 'Mini Game 🎮' (Lucky Spin).\n2. Masuk ke tab 'Kasir'.\n3. Ketik/tempel kode di kolom 'Kode Promo / Diskon'.\n4. Klik tombol 'Kupon' untuk klaim potongan harga!";
+      } 
+      // 6. Maksud dari Jasa OTP
+      else if (text.includes('otp') || text.includes('jasa otp') || text.includes('bot wa')) {
+        return "Jasa OTP / Bot WA adalah layanan untuk pengiriman kode verifikasi otomatis, bot Customer Service WA, atau kebutuhan integrasi pesan singkat secara cepat & praktis.";
+      } 
+      // 7. Saya masih ga mengerti / bingung
+      else if (text.includes('ga mengerti') || text.includes('gak mengerti') || text.includes('nggak paham') || text.includes('bingung') || text.includes('pusing') || text.includes('ga paham')) {
+        return "Jika masih bingung atau ada pertanyaan lainnya, silakan langsung hubungi nomor WhatsApp Admin kami di **083196587229** ya!";
+      } 
+      // Penutup / Default Response (Fallback)
+      else {
+        return "Baik, semoga kamu paham ya! Kalau ada hal lain yang bikin bingung, jangan ragu buat tanya lagi atau langsung hubungi Admin! ✨";
+      }
+    }
+  </script>
+</body>
+</html>
